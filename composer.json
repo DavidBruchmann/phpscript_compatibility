@@ -1,0 +1,20 @@
+{
+	"name": "simonschaufi/phpscript-compatibility",
+	"type": "typo3-cms-extension",
+	"description": "Backwards compatibility of PHP_SCRIPT",
+	"homepage": "https://github.com/simonschaufi",
+	"license": ["GPL-2.0+"],
+	"keywords": ["TYPO3 CMS", "PHP_SCRIPT"],
+	"require": {
+		"typo3/cms-core": "^6.2.0 || ^7.6.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Simonschaufi\\PhpscriptCompatibility\\": "Classes/"
+		}
+	},
+	"replace": {
+		"phpscript_compatibility": "self.version",
+		"typo3-ter/phpscript-compatibility": "self.version"
+	}
+}
