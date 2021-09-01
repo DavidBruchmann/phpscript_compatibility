@@ -18,12 +18,12 @@ $EM_CONF[$_EXTKEY] = array (
 	'author_email' => 'simonschaufi+typo3@gmail.com',
 	'state' => 'stable',
 	'clearCacheOnLoad' => 1,
-	'version' => '1.0.1',
+	'version' => '1.1.0',
 	'constraints' => 
 	array (
 		'depends' => 
 		array (
-			'typo3' => '6.2.0-7.6.99',
+			'typo3' => '6.2.0-10.4.99',
 		),
 		'conflicts' => 
 		array (
