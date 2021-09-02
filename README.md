@@ -11,3 +11,6 @@ my_php_script {
 ```
 
 **This extension should only be used for compatibility reasons! Please use [Userfunctions](https://docs.typo3.org/typo3cms/TyposcriptReference/ContentObjects/UserAndUserInt/Index.html) instead!**
+
+
+See https://www.youtube.com/watch?v=15_HsnC_60Q
