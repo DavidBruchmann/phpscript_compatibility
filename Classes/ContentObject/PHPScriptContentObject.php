@@ -1,4 +1,5 @@
 <?php
+
 namespace Simonschaufi\PhpscriptCompatibility\ContentObject;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -10,23 +11,23 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class PHPScriptContentObject
 {
 
-	/**
-	 * Rendering the cObject, PHP_SCRIPT
-	 *
-	 * @param string $typoScriptObjectName (PHP_SCRIPT)
-	 * @param array $conf
-	 * @param string $typoScriptKey (ie. 10)
-	 * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
-	 * @return string Output
-	 */
-	public function cObjGetSingleExt($typoScriptObjectName, array $conf, $typoScriptKey, ContentObjectRenderer $contentObject)
+    /**
+     * Rendering the cObject, PHP_SCRIPT
+     *
+     * @param string $typoScriptObjectName (PHP_SCRIPT)
+     * @param array $conf
+     * @param string $typoScriptKey (ie. 10)
+     * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
+     * @return string Output
+     */
+    public function cObjGetSingleExt($typoScriptObjectName, array $conf, $typoScriptKey, ContentObjectRenderer $contentObject)
     {
-		$content = '';
+        $content = '';
         if (!empty($conf['file'])) {
             $content = $this->processIncludeFile($typoScriptObjectName, $conf, $typoScriptKey, $contentObject);
         }
-		return $content;
-	}
+        return $content;
+    }
 
     protected function processIncludeFile($typoScriptObjectName, array $conf, $typoScriptKey, ContentObjectRenderer $contentObject)
     {
