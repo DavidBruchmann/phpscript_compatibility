@@ -36,7 +36,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  *
  * @author Jo Hasenau <info@cybercraft.de>
  */
-class PhpScriptExt extends AbstractPhpScript()
+class PhpScriptExt extends AbstractPhpScript
 {
 
     protected function render(string $incFile, string $content, array $conf, ContentObjectRenderer $contentObject)
