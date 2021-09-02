@@ -36,7 +36,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  *
  * @author David Bruchmann <david.bruchmann@gmail.com>
  */
-class AbstractPhpScript()
+class AbstractPhpScript
 {
 
     /**
@@ -51,19 +51,20 @@ class AbstractPhpScript()
     public function cObjGetSingleExt($typoScriptObjectName, array $conf, $typoScriptKey, ContentObjectRenderer $contentObject)
     {
         $content = '';
+        $this->cObj = $contentObject;
         if (!empty($conf['file'])) {
-            if ($incFile = $this->getIncFile($conf, $contentObject)) {
-                $content = $this->render($incFile, $content, $conf, $contentObject);
+            if ($incFile = $this->getIncFile($conf)) {
+                $content = $this->render($incFile, $content, $conf);
                 $content = $this->stdWrap($content, $conf);
             }
 		}
         return $content;
     }
 
-    protected function getIncFile($conf, $contentObject)
+    protected function getIncFile($conf)
     {
         $file = isset($conf['file.'])
-            ? $contentObject->stdWrap($conf['file'], $conf['file.'])
+            ? $this->cObj->stdWrap($conf['file'], $conf['file.'])
             : $conf['file'];
 
         // Note that allowed paths can be configured with
@@ -75,12 +76,7 @@ class AbstractPhpScript()
             $filePathSanitizer = GeneralUtility::makeInstance('TYPO3\CMS\Frontend\Resource\FilePathSanitizer');
             $incFile = $filePathSanitizer->sanitize($file);
         }
-
-        if ($incFile && $GLOBALS['TSFE']->checkFileInclude($incFile)) {
-            return $incFile;
-        } else {
-            return null;
-        }
+        return $incFile ? $incFile : null;
     }
 
     protected function stdWrap($content, $conf)
@@ -88,5 +84,6 @@ class AbstractPhpScript()
         if (isset($conf['stdWrap.'])) {
 			$content = $this->cObj->stdWrap($content, $conf['stdWrap.']);
 		}
+        return $content;
     }
 }

@@ -17,3 +17,4 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['cObj
     'PHP_SCRIPT_EXT',
     \Simonschaufi\PhpscriptCompatibility\ContentObject\PhpScriptExt::class
 ];
+

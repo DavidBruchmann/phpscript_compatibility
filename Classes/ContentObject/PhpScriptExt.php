@@ -39,7 +39,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class PhpScriptExt extends AbstractPhpScript
 {
 
-    protected function render(string $incFile, string $content, array $conf, ContentObjectRenderer $contentObject)
+    protected function render(string $incFile, string $content, array $conf)
     {
         $content = '';
         $substKey = 'EXT_SCRIPT.' . $GLOBALS['TSFE']->uniqueHash();

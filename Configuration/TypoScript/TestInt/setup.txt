@@ -1,0 +1,5 @@
+// Test:
+page.250 = PHP_SCRIPT_INT
+page.250 {
+  file = EXT:phpscript_compatibility/Resources/Private/PHP/testscript_INT.inc.php
+}

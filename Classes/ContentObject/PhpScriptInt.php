@@ -41,7 +41,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class PhpScriptInt extends AbstractPhpScript
 {
 
-    protected function render(string $incFile, string $content, array $conf, ContentObjectRenderer $contentObject)
+    protected function render(string $incFile, string $content, array $conf)
     {
         $content = '';
         $substKey = 'INT_SCRIPT.' . $GLOBALS['TSFE']->uniqueHash();
