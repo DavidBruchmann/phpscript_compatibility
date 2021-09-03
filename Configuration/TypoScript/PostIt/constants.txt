@@ -1,2 +1,0 @@
-styles.content.links.extTarget = _blank
-styles.content.links.target = _top

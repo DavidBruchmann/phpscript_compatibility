@@ -32,7 +32,7 @@
  * Revised for TYPO3 3.6 June/2003 by Kasper Skårhøj
  * XHTML compliant
  *
- * @author	Kasper Skårhøj <kasperYYYY@typo3.com>
+ * @author    Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 
 
@@ -49,15 +49,22 @@ TypoScript config:
 
 
 
-.data		[string / stdWrap]		The data for the notes. Every line is a new note. Each line is divided by "|" where the first part is the test, the second part is the type (1-) and the third part is the optional link (typolink-format)
-.charsPerLine	[string]			The max number of chars per line of text on the note.
-.images.[x]		[image-contentObjects]   [x] is the type-number defined by the second parameter in each line of data.
+.data              [string / stdWrap]     The data for the notes. Every line is a new note.
+                                            Each line is divided by "|" where
+                                            - the first part is the test
+                                            - the second part is the type (1-)
+                                            - the third part is the optional link (typolink-format)
+.charsPerLine      [string]               The max number of chars per line of text on the note.
+.images.[x]        [image-contentObjects] [x] is the type-number defined by the second parameter in each line of data.
 .textBox {
-    chars						integer, the number of chars on each line
-    lineDist					integer, the number of pixels between each line
-    tmplObjNumber 				integer, pointer to the GIFBUILDER-OBJECT (of type TEXT!!) which serves as a TEMPLATE for the objects used to create the textlines
-    Valign 						string. If set to "center", the tmplObjNumber-TEXT-object is expected to be centeret in the image and calculations will be done to spred the lines above and below in case of multiple lines. (based on .angle of the TEXT object also.)
-	maxLines
+    chars          [integer]              the number of chars on each line
+    lineDist       [integer]              integer, the number of pixels between each line
+    tmplObjNumber  [integer]              integer, pointer to the GIFBUILDER-OBJECT (of type TEXT!!) which
+                                            serves as a TEMPLATE for the objects used to create the textlines
+    Valign         [string]               string. If set to "center", the tmplObjNumber-TEXT-object is expected to be centeret
+                                            in the image and calculations will be done to spred the lines above and below in case
+                                            of multiple lines. (based on .angle of the TEXT object also.)
+    maxLines       [integer]
   }
 
 
@@ -65,7 +72,7 @@ Example:
 
 
 // Postit:
-tt_content.splash.20 = PHP_SCRIPT
+tt_content.php_script.20.post_it = PHP_SCRIPT
 tt_content.splash.20 {
   file = media/scripts/postit.inc
   data.field = bodytext
@@ -75,7 +82,7 @@ tt_content.splash.20 {
     lineDist = 18
     tmplObjNumber = 100
     Valign = center
-	maxLines = 5
+    maxLines = 5
   }
   typolink {
     parameter.current = 1
@@ -90,6 +97,7 @@ tt_content.splash.20 {
     5.file = media/uploads/postit_1.gif
     100 = TEXT
     100.text = Testing
+    # 100.text.field = bodytext
     100.offset = -5,60
     100.fontFile = fileadmin/fonts/arial_bold.ttf
     100.fontSize = 15
@@ -110,52 +118,65 @@ tt_content.splash.20 {
 
 
 
-
-$data = $this->stdWrap($conf['data'],$conf['data.']);
+if ($GLOBALS['TSFE']->cObj->getCurrentTable() == 'tt_content') {
+    $data = $GLOBALS['TSFE']->cObj->cObjGetSingle($conf['data'], $conf['data.']);
+}
 $cols = intval($conf['cols']) ? intval($conf['cols']) : 3;
 
+if (empty($data)) {
+    $data =
+        'Text Line 1|1|https://typo3.org' . "\n" .
+        'Text Line 2|2|https://typo3.com' . "\n" .
+        'Text Line 3|3|https://typo3.org' . "\n" .
+        'Text Line 4|1|https://typo3.com' . "\n" .
+        'Text Line 5|2|https://typo3.org' . "\n" .
+        'Text Line 6|3|https://typo3.com' . "\n";
+}
 
 $lines = explode(chr(10),$data);
+debug(['lines' => $lines, '$data' => $data, '$conf' => $conf, $GLOBALS['TSFE']->cObj->data], __FILE__ . __LINE__);
 $imageArr = array();
 foreach ($lines as $key => $content) {
-	$content = trim($content);
-	if ($content)	{
-		$parts = explode('|',$content);
-		$text = trim($parts[0]);
-		$type = t3lib_utility_Math::forceIntegerInRange($parts[1],1,3);
-		$link = trim($parts[2]);
-		if ($text)	{
-			$imgConf = $conf['images.'][$type.'.'];
-			$imgConf['file.'] = $this->gifBuilderTextBox ($imgConf['file.'], $conf['textBox.'], $text);
+    $content = trim($content);
+    if ($content)    {
+        $parts = explode('|',$content);
+        $text = trim($parts[0]);
+        $type = \TYPO3\CMS\Core\Utility\MathUtility::forceIntegerInRange($parts[1],1,3);
+        $link = trim($parts[2]);
+        if ($text)    {
+            $imgConf = $conf['images.'][$type.'.'];
+            # $imgConf['file.'] = $GLOBALS['TSFE']->cObj->gifBuilderTextBox ($imgConf['file.'], $conf['textBox.'], $text);
+            # $imgConf['file.'] = $GLOBALS['TSFE']->cObj->getImageResource ($imgConf, $imgConf['file.'], $conf['textBox.'], $text);
 
-			$image = $this->IMAGE($imgConf);
-			if ($image)	{
-				$this->setCurrentVal($link);
-				$imageArr[] = $this->typolink($image,$conf['typolink.']);
-			}
-		}
-	}
+            $imageCobj = $GLOBALS['TSFE']->cObj->getContentObject('IMAGE');
+            $image = $imageCobj->render($imgConf);
+            if ($image)    {
+                $GLOBALS['TSFE']->cObj->setCurrentVal($link);
+                $imageArr[] = $GLOBALS['TSFE']->cObj->typolink($image,$conf['typolink.']);
+            }
+        }
+    }
 }
 
 
-if (is_array($imageArr))	{
-	reset($imageArr);
-	if ($cols)	{
-		$res = '';
-		$rows = ceil(count($imageArr)/$cols);
+if (is_array($imageArr))    {
+    reset($imageArr);
+    if ($cols)    {
+        $res = '';
+        $rows = ceil(count($imageArr)/$cols);
 
-		for ($a=0;$a<$rows;$a++)	{
-			$res.='<tr>';
-			for ($b=0;$b<$cols;$b++)	{
-				$res.='<td>'.$imageArr[(($a*$cols)+$b)].'</td>';
-			}
-			$res.='</tr>';
-		}
+        for ($a=0;$a<$rows;$a++)    {
+            $res.='<tr>';
+            for ($b=0;$b<$cols;$b++)    {
+                $res.='<td>'.$imageArr[(($a*$cols)+$b)].'</td>';
+            }
+            $res.='</tr>';
+        }
 
-		$content='<table border="0" cellspacing="0" cellpadding="0">'.$res.'</table>';
-	} else {
-		$content.=implode($imageArr,'');
-	}
+        $content='<table border="0" cellspacing="0" cellpadding="0">'.$res.'</table>';
+    } else {
+        $content.=implode($imageArr,'');
+    }
 }
 
 ?>

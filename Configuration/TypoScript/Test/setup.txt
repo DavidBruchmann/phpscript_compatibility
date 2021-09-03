@@ -1,5 +1,0 @@
-// Test:
-tt_content.splash.20 = PHP_SCRIPT
-tt_content.splash.20 {
-  file = EXT:phpscript_compatibility/Resources/Private/PHP/testscript.inc.php
-}

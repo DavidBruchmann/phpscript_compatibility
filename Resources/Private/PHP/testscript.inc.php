@@ -6,8 +6,6 @@
 
 if (!is_object($this)) die ('Error: No parent object present.');
 
-
-
-$content='This is a testscript';
+$content = 'This text is coming from a PHP testscript.';
 
 ?>
