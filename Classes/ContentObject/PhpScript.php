@@ -39,19 +39,19 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class PhpScript extends AbstractPhpScript
 {
 
-    protected function render(string $incFile, string $content, array $conf)
+    protected function render(string $incFile, string $content, array $CONF, ContentObjectRenderer $cOBJ)
     {
         $content = '';
         // Make backup:
-        $oldData = $this->cObj->data;
+        $cOBJ->oldData = $cOBJ->data;
         $RESTORE_OLD_DATA = FALSE;
         // Include file
         // - must provide any results in the variable `$content`
-        // - can optionally set $RESTORE_OLD_DATA to `true` for $this->cObj->data
+        // - can optionally set $RESTORE_OLD_DATA to `true` for $cOBJ->data
         include ('./' . $incFile);
         // restore, if requested:
         if ($RESTORE_OLD_DATA) {
-            $this->cObj->data = $oldData;
+            $cOBJ->data = $cOBJ->oldData;
         }
         return $content;
     }

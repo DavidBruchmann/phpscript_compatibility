@@ -41,15 +41,17 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class PhpScriptInt extends AbstractPhpScript
 {
 
-    protected function render(string $incFile, string $content, array $conf)
+    protected function render(string $incFile, string $content, array $CONF, ContentObjectRenderer $cOBJ)
     {
         $content = '';
         $substKey = 'INT_SCRIPT.' . $GLOBALS['TSFE']->uniqueHash();
         $content .= '<!--' . $substKey . '-->';
         $GLOBALS['TSFE']->config['INTincScript'][$substKey] = array (
-            'file' => $incFile, 'conf' => $conf, 'type' => 'SCRIPT'
+            'file' => $incFile,
+            'CONF' => $CONF,
+            'type' => 'SCRIPT'
         );
-        $GLOBALS['TSFE']->config['INTincScript'][$substKey]['cObj'] = serialize($this->cObj);
+        $GLOBALS['TSFE']->config['INTincScript'][$substKey]['cObj'] = serialize($cOBJ);
 		return $content;
 	}
 }

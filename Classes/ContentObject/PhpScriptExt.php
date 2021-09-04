@@ -39,15 +39,17 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class PhpScriptExt extends AbstractPhpScript
 {
 
-    protected function render(string $incFile, string $content, array $conf)
+    protected function render(string $incFile, string $content, array $CONF, ContentObjectRenderer $cOBJ)
     {
         $content = '';
         $substKey = 'EXT_SCRIPT.' . $GLOBALS['TSFE']->uniqueHash();
         $content .= '<!--' . $substKey . '-->';
         $GLOBALS['TSFE']->config['EXTincScript'][$substKey] = array (
-            'file' => $incFile, 'conf' => $conf, 'type' => 'SCRIPT'
+            'file' => $incFile,
+            'CONF' => $CONF,
+            'type' => 'SCRIPT'
         );
-        $GLOBALS['TSFE']->config['EXTincScript'][$substKey]['data'] = $this->cObj->data;
+        $GLOBALS['TSFE']->config['EXTincScript'][$substKey]['data'] = $cOBJ->data;
 		return $content;
 	}
 }

@@ -40,9 +40,120 @@
 if (!is_object($this)) die ('Error: No parent object present.');
 
 
+/**
+ * The following block of functions is copied from the old TYPO3 version 4.7.20,
+ * so that the old example can be used despite the methods have been removed from TYPO3.
+ * In TYPO3 versions < 9.0 the original methods are used.
+ */
+if (!version_compare(TYPO3_version, '9.0', '<')) {
+    if (!function_exists('clearTSProperties')) {
+        /**
+         * Clears TypoScript properties listed in $propList from the input TypoScript array.
+         *
+         * @param	array		TypoScript array of values/properties
+         * @param	string		List of properties to clear both value/properties for. Eg. "myprop,another_property"
+         * @return	array		The TypoScript array
+         * @see gifBuilderTextBox()
+         */
+        function clearTSProperties($TSArr, $propList) {
+            $list = explode(',', $propList);
+            foreach ($list as $prop) {
+                $prop = trim($prop);
+                unset($TSArr[$prop]);
+                unset($TSArr[$prop . '.']);
+            }
+            return $TSArr;
+        }
+    }
+
+    if (!function_exists('linebreaks')) {
+        /**
+         * Splits a text string into lines and returns an array with these lines but a max number of lines.
+         *
+         * @param	string		The string to break
+         * @param	integer		Max number of characters per line.
+         * @param	integer		Max number of lines in all.
+         * @return	array		array with lines.
+         * @access private
+         * @see gifBuilderTextBox()
+         */
+        function linebreaks($string, $chars, $maxLines = 0) {
+            $lines = explode(LF, $string);
+            $lineArr = array();
+            $c = 0;
+            foreach ($lines as $paragraph) {
+                $words = explode(' ', $paragraph);
+                foreach ($words as $word) {
+                    if (strlen($lineArr[$c] . $word) > $chars) {
+                        $c++;
+                    }
+                    if (!$maxLines || $c < $maxLines) {
+                        $lineArr[$c] .= $word . ' ';
+                    }
+                }
+                $c++;
+            }
+            return $lineArr;
+        }
+    }
 
 
+    if (!function_exists('gifBuilderTextBox')) {
+        /**
+         * This function creates a number of TEXT-objects in a Gifbuilder configuration in order to create a text-field like thing. Used with the script tslib/media/scripts/postit.inc
+         *
+         * @param	array		TypoScript properties for Gifbuilder - TEXT GIFBUILDER objects are added to this array and returned.
+         * @param	array		TypoScript properties for this function
+         * @param	string		The text string to write onto the GIFBUILDER file
+         * @return	array		The modified $gifbuilderConf array
+         * @see media/scripts/postit.inc
+         */
+        function gifBuilderTextBox($gifbuilderConf, $conf, $text) {
+            $chars = intval($conf['chars']) ? intval($conf['chars']) : 20;
+            $lineDist = intval($conf['lineDist']) ? intval($conf['lineDist']) : 20;
+            $Valign = strtolower(trim($conf['Valign']));
+            $tmplObjNumber = intval($conf['tmplObjNumber']);
+            $maxLines = intval($conf['maxLines']);
 
+            if ($tmplObjNumber && $gifbuilderConf[$tmplObjNumber] == 'TEXT') {
+                $textArr = linebreaks($text, $chars, $maxLines);
+                $angle = intval($gifbuilderConf[$tmplObjNumber . '.']['angle']);
+                foreach ($textArr as $c => $textChunk) {
+                    $index = $tmplObjNumber + 1 + ($c * 2);
+                        // Workarea
+                    $gifbuilderConf = clearTSProperties($gifbuilderConf, $index);
+                    $rad_angle = 2 * pi() / 360 * $angle;
+                    $x_d = sin($rad_angle) * $lineDist;
+                    $y_d = cos($rad_angle) * $lineDist;
+
+                    $diff_x_d = 0;
+                    $diff_y_d = 0;
+                    if ($Valign == 'center') {
+                        $diff_x_d = $x_d * count($textArr);
+                        $diff_x_d = $diff_x_d / 2;
+                        $diff_y_d = $y_d * count($textArr);
+                        $diff_y_d = $diff_y_d / 2;
+                    }
+
+
+                    $x_d = round($x_d * $c - $diff_x_d);
+                    $y_d = round($y_d * $c - $diff_y_d);
+
+                    $gifbuilderConf[$index] = 'WORKAREA';
+                    $gifbuilderConf[$index . '.']['set'] = $x_d . ',' . $y_d;
+                        // Text
+                    $index++;
+                    $gifbuilderConf = clearTSProperties($gifbuilderConf, $index);
+                    $gifbuilderConf[$index] = 'TEXT';
+                    $gifbuilderConf[$index . '.'] = clearTSProperties($gifbuilderConf[$tmplObjNumber . '.'], 'text');
+                    $gifbuilderConf[$index . '.']['text'] = $textChunk;
+                }
+                $gifbuilderConf = clearTSProperties($gifbuilderConf, $tmplObjNumber);
+            }
+            return $gifbuilderConf;
+        }
+    }
+}
 
 /***************************************************************
 TypoScript config:
@@ -116,12 +227,12 @@ tt_content.splash.20 {
 ****************************************************************/
 
 
+# debug(['currentTable' => $cOBJ->getCurrentTable(), '$cOBJ->data' => $cOBJ->data, '$CONF' => $CONF], __FILE__ . __LINE__);
 
-
-if ($GLOBALS['TSFE']->cObj->getCurrentTable() == 'tt_content') {
-    $data = $GLOBALS['TSFE']->cObj->cObjGetSingle($conf['data'], $conf['data.']);
+if ($cOBJ->getCurrentTable() == 'tt_content') {
+    $data = $cOBJ->cObjGetSingle($CONF['data'], $CONF['data.']);
 }
-$cols = intval($conf['cols']) ? intval($conf['cols']) : 3;
+$cols = intval($CONF['cols']) ? intval($CONF['cols']) : 3;
 
 if (empty($data)) {
     $data =
@@ -133,26 +244,31 @@ if (empty($data)) {
         'Text Line 6|3|https://typo3.com' . "\n";
 }
 
-$lines = explode(chr(10),$data);
-debug(['lines' => $lines, '$data' => $data, '$conf' => $conf, $GLOBALS['TSFE']->cObj->data], __FILE__ . __LINE__);
+$lines = explode(chr(10), $data);
+
+# debug(['$data' => $data, 'lines' => $lines], __FILE__ . __LINE__);
+
 $imageArr = array();
 foreach ($lines as $key => $content) {
     $content = trim($content);
     if ($content)    {
-        $parts = explode('|',$content);
+        $parts = explode('|', $content);
         $text = trim($parts[0]);
-        $type = \TYPO3\CMS\Core\Utility\MathUtility::forceIntegerInRange($parts[1],1,3);
+        $type = \TYPO3\CMS\Core\Utility\MathUtility::forceIntegerInRange($parts[1], 1, 3);
         $link = trim($parts[2]);
         if ($text)    {
-            $imgConf = $conf['images.'][$type.'.'];
-            # $imgConf['file.'] = $GLOBALS['TSFE']->cObj->gifBuilderTextBox ($imgConf['file.'], $conf['textBox.'], $text);
-            # $imgConf['file.'] = $GLOBALS['TSFE']->cObj->getImageResource ($imgConf, $imgConf['file.'], $conf['textBox.'], $text);
+            $imgConf = $CONF['images.'][$type . '.'];
+            if (version_compare(TYPO3_version, '9.0', '<')) {
+                $imgConf['file.'] = $cOBJ->gifBuilderTextBox ($imgConf['file.'], $CONF['textBox.'], $text);
+            } else {
+                $imgConf['file.'] = gifBuilderTextBox ($imgConf['file.'], $CONF['textBox.'], $text);
+            }
 
-            $imageCobj = $GLOBALS['TSFE']->cObj->getContentObject('IMAGE');
+            $imageCobj = $cOBJ->getContentObject('IMAGE');
             $image = $imageCobj->render($imgConf);
             if ($image)    {
-                $GLOBALS['TSFE']->cObj->setCurrentVal($link);
-                $imageArr[] = $GLOBALS['TSFE']->cObj->typolink($image,$conf['typolink.']);
+                $cOBJ->setCurrentVal($link);
+                $imageArr[] = $cOBJ->typolink($image, $CONF['typolink.']);
             }
         }
     }
@@ -163,19 +279,19 @@ if (is_array($imageArr))    {
     reset($imageArr);
     if ($cols)    {
         $res = '';
-        $rows = ceil(count($imageArr)/$cols);
+        $rows = ceil(count($imageArr) / $cols);
 
-        for ($a=0;$a<$rows;$a++)    {
-            $res.='<tr>';
-            for ($b=0;$b<$cols;$b++)    {
-                $res.='<td>'.$imageArr[(($a*$cols)+$b)].'</td>';
+        for ($a = 0; $a < $rows; $a++)    {
+            $res .= '<tr>';
+            for ($b = 0; $b<$cols; $b++)    {
+                $res .= '<td>' . $imageArr[(($a * $cols) + $b)].'</td>';
             }
-            $res.='</tr>';
+            $res .= '</tr>';
         }
 
-        $content='<table border="0" cellspacing="0" cellpadding="0">'.$res.'</table>';
+        $content = '<table border="0" cellspacing="0" cellpadding="0">' . $res . '</table>';
     } else {
-        $content.=implode($imageArr,'');
+        $content .= implode($imageArr, '');
     }
 }
 

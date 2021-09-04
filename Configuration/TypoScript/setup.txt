@@ -22,11 +22,11 @@ tt_content.php_script.20 {
     test {
         file = EXT:phpscript_compatibility/Resources/Private/PHP/testscript.inc.php
     }
-    test_int = PHP_SCRIPT
+    test_int = PHP_SCRIPT_INT
     test_int {
         file = EXT:phpscript_compatibility/Resources/Private/PHP/testscript_INT.inc.php
     }
-    test_ext = PHP_SCRIPT
+    test_ext = PHP_SCRIPT_EXT
     test_ext {
         file = EXT:phpscript_compatibility/Resources/Private/PHP/testscript_EXT.inc.php
     }
@@ -76,8 +76,8 @@ tt_content.php_script.20 {
             }
         }
     }
-    test_inc = PHP_SCRIPT
-    test_inc {
+    freesite_dummy_page_menu = PHP_SCRIPT
+    freesite_dummy_page_menu {
         file = EXT:phpscript_compatibility/Resources/Private/PHP/freesite_dummy_page_menu.inc.php
     }
 }
