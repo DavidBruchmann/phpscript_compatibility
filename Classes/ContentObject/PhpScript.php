@@ -36,22 +36,22 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 /**
  * Contains PHP_SCRIPT class object.
  */
-class PhpScript extends AbstractPhpScript()
+class PhpScript extends AbstractPhpScript
 {
 
-    protected function render(string $incFile, string $content, array $conf, ContentObjectRenderer $contentObject)
+    protected function render(string $incFile, string $content, array $CONF, ContentObjectRenderer $cOBJ)
     {
         $content = '';
-        // Added 31-12-00: Make backup...
-        $contentObject->oldData = $contentObject->data;
+        // Make backup:
+        $cOBJ->oldData = $cOBJ->data;
         $RESTORE_OLD_DATA = FALSE;
         // Include file
         // - must provide any results in the variable `$content`
-        // - can optionally set $RESTORE_OLD_DATA to `true` for $contentObject->data
+        // - can optionally set $RESTORE_OLD_DATA to `true` for $cOBJ->data
         include ('./' . $incFile);
-        // Added 31-12-00: restore...
+        // restore, if requested:
         if ($RESTORE_OLD_DATA) {
-            $contentObject->data = $contentObject->oldData;
+            $cOBJ->data = $cOBJ->oldData;
         }
         return $content;
     }
