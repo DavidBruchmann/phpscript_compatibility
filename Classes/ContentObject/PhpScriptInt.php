@@ -51,7 +51,34 @@ class PhpScriptInt extends AbstractPhpScript
             'CONF' => $CONF,
             'type' => 'SCRIPT'
         );
-        $GLOBALS['TSFE']->config['INTincScript'][$substKey]['cObj'] = serialize($cOBJ);
-		return $content;
+		$GLOBALS['TSFE']->config['INTincScript'][$substKey]['cObj'] = serialize($cObj);
+
+
+            /* // ORIGINAL:
+			$substKey = 'INT_SCRIPT.' . $GLOBALS['TSFE']->uniqueHash();
+			$content .= '<!--' . $substKey . '-->';
+			$GLOBALS['TSFE']->config['INTincScript'][$substKey] = array (
+				'file' => $incFile, 'conf' => $conf, 'type' => 'SCRIPT'
+			);
+            if (isset($conf['stdWrap.'])) {
+                $content = $this->cObj->stdWrap($content, $conf['stdWrap.']);
+            }
+            return $content;
+            */
+
+
+        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([
+            '$cOBJ'=>$cOBJ,
+            '$cOBJ->data'=>$cOBJ->data,
+            '$CONF' => $CONF,
+            '$substKey' => $substKey,
+            '$content' => $content,
+            '$GLOBALS[\'TSFE\']->config[\'INTincScript\'][$substKey]' => $GLOBALS['TSFE']->config['INTincScript'][$substKey],
+            '$GLOBALS[\'TSFE\']->config[\'INTincScript\'][$substKey][\'cObj\']' => $GLOBALS['TSFE']->config['INTincScript'][$substKey]['cObj'],
+            '$content' => $content,
+        ], __METHOD__ . ':' . __LINE__);
+		# return '<pre>' . $GLOBALS['TSFE']->config['INTincScript'][$substKey]['cObj'] . '</pre>';
+
+        return $content;
 	}
 }
