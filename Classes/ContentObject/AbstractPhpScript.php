@@ -36,7 +36,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  *
  * @author David Bruchmann <david.bruchmann@gmail.com>
  */
-class AbstractPhpScript()
+class AbstractPhpScript
 {
 
     /**
@@ -48,19 +48,19 @@ class AbstractPhpScript()
      * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
      * @return string Output
      */
-    public function cObjGetSingleExt($typoScriptObjectName, array $conf, $typoScriptKey, ContentObjectRenderer $contentObject)
+    public function cObjGetSingleExt(string $typoScriptObjectName, array $conf, string $typoScriptKey, ContentObjectRenderer $contentObject)
     {
         $content = '';
         if (!empty($conf['file'])) {
             if ($incFile = $this->getIncFile($conf, $contentObject)) {
                 $content = $this->render($incFile, $content, $conf, $contentObject);
-                $content = $this->stdWrap($content, $conf);
+                $content = $this->stdWrap($content, $conf, $contentObject);
             }
 		}
         return $content;
     }
 
-    protected function getIncFile($conf, $contentObject)
+    protected function getIncFile(array $conf, ContentObjectRenderer $contentObject)
     {
         $file = isset($conf['file.'])
             ? $contentObject->stdWrap($conf['file'], $conf['file.'])
@@ -75,18 +75,14 @@ class AbstractPhpScript()
             $filePathSanitizer = GeneralUtility::makeInstance('TYPO3\CMS\Frontend\Resource\FilePathSanitizer');
             $incFile = $filePathSanitizer->sanitize($file);
         }
-
-        if ($incFile && $GLOBALS['TSFE']->checkFileInclude($incFile)) {
-            return $incFile;
-        } else {
-            return null;
-        }
+        return $incFile ? $incFile : null;
     }
 
-    protected function stdWrap($content, $conf)
+    protected function stdWrap(string $content, array $conf, ContentObjectRenderer $contentObject)
     {
         if (isset($conf['stdWrap.'])) {
-			$content = $this->cObj->stdWrap($content, $conf['stdWrap.']);
+			$content = $contentObject->stdWrap($content, $conf['stdWrap.']);
 		}
+        return $content;
     }
 }
