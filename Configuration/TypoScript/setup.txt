@@ -7,7 +7,7 @@ tt_content.php_script.20 {
         field = list_type
     }
     default = TEXT
-    default value=
+    default.value =
     test = PHP_SCRIPT
     test {
         file = EXT:phpscript_compatibility/Resources/Private/PHP/testscript.inc.php
