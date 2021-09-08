@@ -18,7 +18,7 @@ $EM_CONF[$_EXTKEY] = array (
 	'author_email' => 'simonschaufi+typo3@gmail.com',
 	'state' => 'stable',
 	'clearCacheOnLoad' => 1,
-	'version' => '1.1.0',
+	'version' => '1.2.1',
 	'constraints' => 
 	array (
 		'depends' => 
